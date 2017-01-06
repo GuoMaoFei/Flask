@@ -3,7 +3,7 @@ from  flask.ext.bootstrap import Bootstrap
 from  flask.ext.wtf import  Form
 from  wtforms import StringField,SubmitField
 from  wtforms.validators import Required
-import os
+import os,sys
 from flask.ext.sqlalchemy import SQLAlchemy
 
 basedir=os.path.abspath(os.path.dirname(__file__))
@@ -32,6 +32,22 @@ def user(name):
 class NameForm(Form):
     name=StringField('What is your name?',validators=[Required()])
     submit=SubmitField('Submit')
+
+class Rale(db.Model):
+    __tablename__='roles'
+    id=db.Column(db.Integer,primary_key=True)
+    name=db.Column(db.String(64),unique=True)
+    user=db.relationship('User',backref='role')
+    def __repr__(self):
+        return '<Role %r>'%self.name
+
+class User(db.Model):
+    __tablename__='user'
+    id=db.Column(db.Integer,primary_key=True)
+    username=db.Column(db.String(64),unique=True,index=True)
+    role_id=db.Column(db.Integer,db.ForeignKey('roles.id'))
+    def __repr__(self):
+        return '<User %r>' %self.username
 
 if __name__=='__main__':
     app.run(debug=True)
